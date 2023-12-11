@@ -1,5 +1,5 @@
 // ------------------- Selection Sort ------------------- 
-
+// Selecting the smallest and plaing it at the starting and so on...
 #include<iostream>
 using namespace std;
 
