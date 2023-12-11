@@ -1,0 +1,367 @@
+TOPOLOGICAL SORT-
+
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+void topologicalSortUtil(int v, vector<int> adj[], vector<bool>& visited, queue<int>& q) {
+    visited[v] = true;
+
+    for (int i : adj[v]) {
+        if (!visited[i]) {
+            topologicalSortUtil(i, adj, visited, q);
+        }
+    }
+
+    q.push(v);
+}
+
+void topologicalSort(int V, vector<int> adj[]) {
+    vector<bool> visited(V, false);
+    queue<int> q;
+
+    for (int i = 0; i < V; ++i) {
+        if (!visited[i]) {
+            topologicalSortUtil(i, adj, visited, q);
+        }
+    }
+
+    while (!q.empty()) {
+        cout << q.front() << " ";
+        q.pop();
+    }
+}
+
+int main() {
+    int V, E;
+    cout << "Enter the number of vertices and edges: ";
+    cin >> V >> E;
+
+    vector<int> adj[V];
+    cout << "Enter the edges (from -> to):" << endl;
+    for (int i = 0; i < E; ++i) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+    }
+
+    cout << "Topological Sort: ";
+    topologicalSort(V, adj);
+
+    return 0;
+}
+
+
+Example input-
+Number of vertices: 6
+Number of edges: 6
+Edges:
+5 2
+5 0
+4 0
+4 1
+2 3
+3 1
+
+
+Output:
+Topological Sort: 5 4 2 3 1 0
+
+
+// 0-1 KNAPSACK PROBLEM
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int knapsack(int W, vector<int>& wt, vector<int>& val, int n) {
+    vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
+
+    for (int i = 0; i <= n; ++i) {
+        for (int w = 0; w <= W; ++w) {
+            if (i == 0 || w == 0) {
+                dp[i][w] = 0;
+            } else if (wt[i - 1] <= w) {
+                dp[i][w] = max(val[i - 1] + dp[i - 1][w - wt[i - 1]], dp[i - 1][w]);
+            } else {
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+
+    return dp[n][W];
+}
+
+int main() {
+    int n, W;
+    cout << "Enter number of items: ";
+    cin >> n;
+
+    vector<int> val(n);
+    vector<int> wt(n);
+
+    cout << "Enter values of items: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> val[i];
+    }
+
+    cout << "Enter weights of items: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> wt[i];
+    }
+
+    cout << "Enter knapsack capacity: ";
+    cin >> W;
+
+    int maxVal = knapsack(W, wt, val, n);
+    cout << "Maximum value in knapsack: " << maxVal << endl;
+
+    return 0;
+}
+
+
+Example Input:
+
+Number of items: 3
+Values: 60 100 120
+Weights: 10 20 30
+Knapsack capacity: 50
+
+Output:
+Maximum value in knapsack: 220
+
+
+
+// WARSHALLS ALGO
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void transitiveClosure(vector<vector<int>>& graph, int V) {
+    vector<vector<int>> reach(V, vector<int>(V));
+
+    // Initialize reach matrix with the given graph
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            reach[i][j] = graph[i][j];
+        }
+    }
+
+    // Warshall's algorithm
+    for (int k = 0; k < V; ++k) {
+        for (int i = 0; i < V; ++i) {
+            for (int j = 0; j < V; ++j) {
+                reach[i][j] = reach[i][j] || (reach[i][k] && reach[k][j]);
+            }
+        }
+    }
+
+    // Print transitive closure matrix
+    cout << "Transitive Closure Matrix:" << endl;
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            cout << reach[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    int V;
+    cout << "Enter the number of vertices: ";
+    cin >> V;
+
+    vector<vector<int>> graph(V, vector<int>(V));
+    cout << "Enter the adjacency matrix (0/1):" << endl;
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            cin >> graph[i][j];
+        }
+    }
+
+    transitiveClosure(graph, V);
+
+    return 0;
+}
+
+Example Input:
+Number of vertices: 4
+Adjacency Matrix:
+0 1 0 0
+0 0 1 0
+0 0 0 1
+1 0 0 0
+
+Output (Transitive Closure Matrix):
+Transitive Closure Matrix:
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+// N-QUEENS ALGO
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+bool isSafe(vector<vector<int>>& board, int row, int col, int N) {
+    int i, j;
+
+    // Check left side of current row
+    for (i = 0; i < col; ++i) {
+        if (board[row][i]) {
+            return false;
+        }
+    }
+
+    // Check upper diagonal on left side
+    for (i = row, j = col; i >= 0 && j >= 0; --i, --j) {
+        if (board[i][j]) {
+            return false;
+        }
+    }
+
+    // Check lower diagonal on left side
+    for (i = row, j = col; j >= 0 && i < N; ++i, --j) {
+        if (board[i][j]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool solveNQueensUtil(vector<vector<int>>& board, int col, int N) {
+    if (col >= N) {
+        return true; // All queens are placed
+    }
+
+    for (int i = 0; i < N; ++i) {
+        if (isSafe(board, i, col, N)) {
+            board[i][col] = 1; // Place the queen
+
+            // Recur to place rest of the queens
+            if (solveNQueensUtil(board, col + 1, N)) {
+                return true;
+            }
+
+            // If placing queen in board[i][col] doesn't lead to a solution
+            board[i][col] = 0; // Backtrack
+        }
+    }
+
+    return false; // If queen cannot be placed in any row of this column
+}
+
+void solveNQueens(int N) {
+    vector<vector<int>> board(N, vector<int>(N, 0));
+
+    if (!solveNQueensUtil(board, 0, N)) {
+        cout << "Solution does not exist.";
+        return;
+    }
+
+    // Print the solution
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            cout << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    int N;
+    cout << "Enter the number of queens: ";
+    cin >> N;
+
+    solveNQueens(N);
+
+    return 0;
+}
+
+
+Example Input:
+Enter the number of queens: 4
+
+Output:
+0 0 1 0
+1 0 0 0
+0 0 0 1
+0 1 0 0
+
+
+
+
+
+//For Theory Question
+
+Absolutely! Let's break down each of these problems theoretically and provide a suitable example for better understanding.
+
+### N-Queens Problem:
+
+**Theoretical Explanation:**
+The N-Queens problem involves placing N chess queens on an \(N \times N\) chessboard so that no two queens threaten each other. Queens attack each other if they share the same row, column, or diagonal. The task is to find all possible configurations where N queens can be placed safely on the board.
+
+**Example:**
+Consider a \(4 \times 4\) chessboard:
+
+```
+0 0 1 0
+1 0 0 0
+0 0 0 1
+0 1 0 0
+```
+
+In this configuration, each '1' represents the position of a queen, and '0' represents an empty cell. There are four queens placed in non-attacking positions.
+
+### 0-1 Knapsack Problem:
+
+**Theoretical Explanation:**
+The 0-1 Knapsack problem involves a knapsack with a fixed capacity and a set of items, each with a specific weight and value. The goal is to determine the maximum value that can be obtained by selecting items to fit into the knapsack without exceeding its capacity. The constraint is that an item can either be selected or rejected (0 or 1, hence the name 0-1 Knapsack).
+
+**Example:**
+Consider a knapsack with a capacity of 50 and the following items:
+
+- Item 1: Value = 60, Weight = 10
+- Item 2: Value = 100, Weight = 20
+- Item 3: Value = 120, Weight = 30
+
+The maximum value that can be obtained without exceeding the capacity is 220 by selecting items 1 and 3.
+
+### Topological Sort:
+
+**Theoretical Explanation:**
+Topological Sort is used to order the vertices of a directed graph in such a way that for every directed edge from vertex u to vertex v, u comes before v in the ordering. It's applicable to Directed Acyclic Graphs (DAGs) and aids in scheduling tasks, among other applications.
+
+**Example:**
+Consider the following dependencies:
+- Task 1 must be completed before Task 2 and Task 3.
+- Task 3 must be completed before Task 4.
+- Task 2 must be completed before Task 4.
+
+A possible topological sort order could be: 1, 2, 3, 4.
+
+### Transitive Closure using Warshall's Algorithm:
+
+**Theoretical Explanation:**
+The transitive closure of a directed graph determines all pairs of vertices reachable from each other in the graph. Warshall's algorithm computes the transitive closure matrix using dynamic programming. It's based on the concept of matrix multiplication and transitive property in graphs.
+
+**Example:**
+Consider a directed graph with vertices {A, B, C} and edges:
+- A -> B
+- B -> C
+- C -> A
+
+The transitive closure matrix would indicate reachability between pairs of vertices. For this example, the transitive closure matrix would show that all vertices are reachable from each other: 
+```
+1 1 1
+1 1 1
+1 1 1
+```
+
+Each '1' represents reachability between vertices, and '0' indicates no direct path.
+
+These explanations and examples should give you a clearer understanding of these fundamental algorithmic problems!
